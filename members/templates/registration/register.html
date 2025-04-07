@@ -1,10 +1,10 @@
 {% extends "base.html" %}
-{% block title %}Create Blog Post{%endblock%}
+{% block title %}Register.....{%endblock%}
 {% block content %}
-    <h2>Create Blog Post</h2>
+    <h2>Register</h2>
     <div="form-group">
         <form method="POST">{% csrf_token %}
             {{form.as_p}}
-            <button  class="btn btn-secondary">Post</button>
+            <button  type="submit" class="btn btn-secondary">Submit</button>
     </div>
 {% endblock %}
