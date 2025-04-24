@@ -1,13 +1,17 @@
 {% extends "base.html" %}
 {% block title %}Delete Blog Post{%endblock%}
 {% block content %}
-    <h2>Delete Post</h2><br>
-    <h3>Delete: {{post.title}}</h3>
-    <div="form-group">
-        <form method="POST">{% csrf_token %}
-            <strong>Click Confirm to delete the Post: </strong>
-            <button  class="btn btn-danger">Confirm</button>
-        </form>
-        <a href="{% url 'post_detail' post.pk %}"><button  class="btn btn-secondary">Back</button>
-    </div>
+{% if user.is_authenticated %}
+    {% if user.id == post.author.id %}
+        <h2>Delete Post</h2><br>
+        <h3>Delete: {{post.title}}</h3>
+        <div="form-group">
+            <form method="POST">{% csrf_token %}
+                <strong>Click Confirm to delete the Post: </strong>
+                <button  class="btn btn-danger">Confirm</button>
+            </form>
+            <a href="{% url 'post_detail' post.pk %}"><button  class="btn btn-secondary">Back</button>
+        </div>
+    {% endif %}
+{% endif %}
 {% endblock %}  

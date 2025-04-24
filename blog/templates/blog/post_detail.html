@@ -1,15 +1,78 @@
 {% extends "base.html" %}
-{% block title %}
-    {{post.title_tag}}
-{% endblock %}
-{% block content %}
-<h1>{{ post.title }}</h1>
-<small>By :{{post.author.first_name}} {{post.author.last_name}}</small><br>
-<small>Date: {{post.post_date}}</small><br>
-<hr>
-<p>{{post.body}}</p><br>
 
-<a href="{% url 'post_list' %}" class="btn btn-secondary">Back</a>
-<a href="{% url 'post_update' post.pk %}" class="btn btn-secondary">Update</a>
-<a href="{% url 'post_delete' post.pk %}" class="btn btn-danger">Delete</a>
+{% block title %}
+    {{ post.title_tag }}
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <a href="{% url 'post_list' %}" class="btn btn-outline-secondary mb-3"><i class="bi bi-arrow-left"></i> Back</a>
+
+    <div class="card">
+        <div class="card-body">
+            <h1 class="card-title">{{ post.title }}</h1>
+            <h6 class="text-muted">By {{ post.author.first_name }} {{ post.author.last_name }} | {{ post.post_date }}</h6>
+            <hr>
+            <p class="card-text">{{ post.body|safe }}</p>
+
+            <div class="d-flex justify-content-between align-items-center mt-4">
+                <!-- Like / Unlike Section -->
+                <div class="d-flex align-items-center gap-2">
+                    {% if user.is_authenticated %}
+                        <!-- Like Button -->
+                        <form action="{% url 'like_post' post.pk %}" method="POST" class="mb-0">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-outline-primary">
+                                {% if user in post.likes.all %}
+                                    <i class="bi bi-hand-thumbs-up-fill"></i>
+                                {% else %}
+                                    <i class="bi bi-hand-thumbs-up"></i>
+                                {% endif %}
+                                {{ post.total_likes }}
+                            </button>
+                        </form>
+            
+                        <!-- Unlike Button -->
+                        <form action="{% url 'unlike_post' post.pk %}" method="POST" class="mb-0">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-outline-primary">
+                                {% if user in post.unlikes.all %}
+                                    <i class="bi bi-hand-thumbs-down-fill"></i>
+                                {% else %}
+                                    <i class="bi bi-hand-thumbs-down"></i>
+                                {% endif %}
+                                {{ post.total_unlikes }}
+                            </button>
+                        </form>
+                    {% else %}
+                        <!-- Disabled for unauthenticated users -->
+                        <button class="btn btn-outline-secondary" disabled>
+                            <i class="bi bi-hand-thumbs-up"></i> {{ post.total_likes }}
+                        </button>
+                        <button class="btn btn-outline-secondary" disabled>
+                            <i class="bi bi-hand-thumbs-down"></i> {{ post.total_unlikes }}
+                        </button>
+                    {% endif %}
+                </div>
+            
+                <!-- Edit / Delete Section -->
+                {% if user.is_authenticated and user.id == post.author.id %}
+                    <div class="d-flex align-items-center gap-2">
+                        <a href="{% url 'post_update' post.pk %}" class="btn btn-outline-warning" data-bs-toggle="tooltip" title="Edit">
+                            <i class="bi bi-pencil-square"></i>
+                        </a>
+                        <a href="{% url 'post_delete' post.pk %}" class="btn btn-outline-danger" data-bs-toggle="tooltip" title="Delete">
+                            <i class="bi bi-trash"></i>
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+            
+            {% if not user.is_authenticated %}
+                <p class="mt-2"><a href="{% url 'login' %}?next={{ request.path }}">Login</a> to like or unlike this post.</p>
+            {% endif %}
+            
+        </div>
+    </div>
+</div>
 {% endblock %}

@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% load slug_extras %}
+{% block title %}
+    {{ view.kwargs.category|slug_to_title }}
+{% endblock %}
+{% block content %}
+<div class="container mt-4">
+    {% if object_list %}
+        <h2 class="mb-4 text-center">{{ view.kwargs.category|slug_to_title }}</h2>
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+            {% for post in object_list %}
+                <div class="col">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                <a href="{% url 'post_detail' post.pk %}" class="text-decoration-none text-dark">
+                                    {{ post.title }}
+                                </a>
+                            </h5>
+                            <h6 class="card-subtitle mb-2 text-muted">
+                                {{ post.author.first_name }} {{ post.author.last_name }}
+                            </h6>
+                            <p class="card-text">{{ post.body|slice:":200"|safe }}{% if post.body|length > 200 %}...{% endif %}</p>
+                        </div>
+                        <div class="card-footer bg-transparent border-top-0">
+                            <a href="{% url 'post_detail' post.pk %}" class="btn btn-sm btn-outline-primary">Read More</a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="alert alert-warning mt-4 text-center">
+            <h4 class="alert-heading">Oops!</h4>
+            <p>No posts found in this category.</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

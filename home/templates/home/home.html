@@ -1,5 +1,57 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1>Hello World!</h1>
+<!-- Hero Carousel -->
+<div id="textCarousel" class="carousel slide mb-5 bg-dark text-white rounded shadow-sm mt-5 pt-4" data-bs-ride="carousel">
+    <div class="carousel-inner p-5">
+      <div class="carousel-item active text-center">
+        <h2 class="fw-bold">Welcome to Aavarana</h2>
+        <p class="lead">Explore ideas, express yourself, and read content by amazing creators.</p>
+      </div>
+      <div class="carousel-item text-center">
+        <h2 class="fw-bold">Browse Categories</h2>
+        <p class="lead">Find inspiration across various genres and interests curated for you.</p>
+      </div>
+      <div class="carousel-item text-center">
+        <h2 class="fw-bold">Write Your Own Story</h2>
+        <p class="lead">Join our creator community and publish your first post today!</p>
+      </div>
+    </div>
+    <button class="carousel-control-prev" type="button" data-bs-target="#textCarousel" data-bs-slide="prev">
+      <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+      <span class="visually-hidden">Previous</span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#textCarousel" data-bs-slide="next">
+      <span class="carousel-control-next-icon" aria-hidden="true"></span>
+      <span class="visually-hidden">Next</span>
+    </button>
+  </div>
+<!-- Latest Posts Section -->
+<div class="container">
+  <h2 class="mb-4 text-center">Latest Posts</h2>
+  <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+    {% for post in latest_posts %}
+    <div class="col">
+      <div class="card h-100 shadow-sm">
+        <div class="card-body">
+          <h5 class="card-title">
+            <a href="{% url 'post_detail' post.pk %}" class="text-decoration-none text-dark">{{ post.title }}</a>
+          </h5>
+          <h6 class="card-subtitle mb-2 text-muted">
+            {{ post.author.first_name }} {{ post.author.last_name }}
+          </h6>
+          <p class="card-text">{{ post.body|striptags|slice:":150" }}{% if post.body|striptags|length > 150 %}...{% endif %}</p>
+        </div>
+        <div class="card-footer bg-transparent border-top-0">
+          <a href="{% url 'post_detail' post.pk %}" class="btn btn-sm btn-outline-primary">Read More</a>
+        </div>
+      </div>
+    </div>
+    {% empty %}
+    <div class="col">
+      <div class="alert alert-warning text-center w-100">No posts available yet.</div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
 {% endblock %}

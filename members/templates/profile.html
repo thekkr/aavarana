@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block title %}Your Profile{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="card shadow-sm border-0">
+        <div class="card-body">
+            <div class="row">
+                <!-- Profile Image -->
+                <div class="col-md-4 text-center mb-4 mb-md-0">
+                    {% if user.profile.profile_pic %}
+                        <img src="{{ user.profile.profile_pic.url }}" alt="Profile Picture" class="img-fluid rounded-circle shadow" style="width: 200px; height: 200px; object-fit: cover;">
+                    {% else %}
+                        <div class="d-flex align-items-center justify-content-center bg-light text-muted rounded-circle shadow" style="width: 200px; height: 200px;">
+                            No Photo
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Profile Details -->
+                <div class="col-md-8">
+                    <h3 class="fw-bold">{{ user.first_name }} {{ user.last_name }}</h3>
+                    <p class="text-muted">@{{ user.username }}</p>
+                    <p><strong>Email:</strong> {{ user.email }}</p>
+
+                    {% if user.profile.phone %}
+                        <p><strong>Phone:</strong> {{ user.profile.phone }}</p>
+                    {% endif %}
+            
+                    {% if user.profile.city %}
+                        <p><strong>City:</strong> {{ user.profile.city }}</p>
+                    {% endif %}
+                    <hr>
+
+                    <h5 class="mb-3">Social Media</h5>
+                    <ul class="list-inline">
+                        {% if user.profile.twitter %}
+                            <li class="list-inline-item me-3">
+                                <a href="{{ user.profile.twitter }}" target="_blank" class="text-decoration-none text-primary">
+                                    <i class="fab fa-twitter fa-lg me-1"></i> Twitter
+                                </a>
+                            </li>
+                        {% endif %}
+                        {% if user.profile.instagram %}
+                            <li class="list-inline-item me-3">
+                                <a href="{{ user.profile.instagram }}" target="_blank" class="text-decoration-none text-danger">
+                                    <i class="fab fa-instagram fa-lg me-1"></i> Instagram
+                                </a>
+                            </li>
+                        {% endif %}
+                        {% if user.profile.linkedin %}
+                            <li class="list-inline-item me-3">
+                                <a href="{{ user.profile.linkedin }}" target="_blank" class="text-decoration-none text-info">
+                                    <i class="fab fa-linkedin fa-lg me-1"></i> LinkedIn
+                                </a>
+                            </li>
+                        {% endif %}
+                    </ul>
+
+                    <div class="mt-5 d-flex gap-3">
+                        <a href="{% url 'edit_profile' %}" class="btn btn-primary">Edit Profile</a>
+                        <a href="{% url 'change_password' %}" class="btn btn-outline-warning">Change Password</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

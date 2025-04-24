@@ -1,13 +1,52 @@
 {% extends "base.html" %}
+
 {% block title %}
     Welcome to my Blog
 {% endblock %}
+
 {% block content %}
-<h1>Posts</h1>
-<ul>
+<div class="container mt-4">
+    <h1 class="mb-4">Latest Posts</h1>
+
     {% for post in object_list %}
-        <li><a href="{% url 'post_detail' post.pk %}">{{post.title}}</a> - {{post.author.first_name}} {{post.author.last_name}} - {{post.author.email}}<br>
-            {{post.body}}</li>
+    <div class="card mb-4 shadow-sm">
+        {% if post.image %}
+        <img src="{{ post.image.url }}" class="card-img-top" alt="{{ post.title }}">
+        {% endif %}
+        <div class="card-body">
+          <h4 class="card-title">
+            <a href="{% url 'post_detail' post.pk %}" class="text-decoration-none text-dark">
+              {{ post.title }}
+            </a>
+          </h4>
+      
+          <div class="mb-2">
+            <span class="badge rounded-pill bg-dark">
+              <a href="{% url 'post_category_list' post.category|slugify %}" class="text-white text-decoration-none">
+                {{ post.category }}
+              </a>
+            </span>
+          </div>
+      
+          <h6 class="text-muted">
+            <i class="bi bi-person-fill"></i> {{ post.author.first_name }} {{ post.author.last_name }} |
+            <i class="bi bi-envelope-fill"></i> {{ post.author.email }}
+            <br>
+            <small><i class="bi bi-calendar-event"></i> {{ post.post_date|date:"F j, Y" }}</small>
+          </h6>
+      
+          <p class="card-text mt-3">
+            {{ post.body|striptags|truncatechars:200|safe }}
+          </p>
+      
+          <a href="{% url 'post_detail' post.pk %}" class="btn btn-outline-primary btn-sm">
+            Read More <i class="bi bi-arrow-right"></i>
+          </a>
+        </div>
+      </div>
+      
+    {% empty %}
+        <p>No posts available yet.</p>
     {% endfor %}
-</ul>
+</div>
 {% endblock %}
