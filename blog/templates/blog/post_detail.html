@@ -1,78 +1,204 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block title %}
     {{ post.title_tag }}
 {% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-    <a href="{% url 'post_list' %}" class="btn btn-outline-secondary mb-3"><i class="bi bi-arrow-left"></i> Back</a>
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- Back button with improved styling -->
+            <a href="{% url 'post_list' %}" class="btn btn-light mb-4 rounded-pill shadow-sm">
+                <i class="bi bi-arrow-left me-2"></i>Back to Posts
+            </a>
 
-    <div class="card">
-        <div class="card-body">
-            <h1 class="card-title">{{ post.title }}</h1>
-            <h6 class="text-muted">By {{ post.author.first_name }} {{ post.author.last_name }} | {{ post.post_date }}</h6>
-            <hr>
-            <p class="card-text">{{ post.body|safe }}</p>
-
-            <div class="d-flex justify-content-between align-items-center mt-4">
-                <!-- Like / Unlike Section -->
-                <div class="d-flex align-items-center gap-2">
-                    {% if user.is_authenticated %}
-                        <!-- Like Button -->
-                        <form action="{% url 'like_post' post.pk %}" method="POST" class="mb-0">
-                            {% csrf_token %}
-                            <button type="submit" class="btn btn-outline-primary">
-                                {% if user in post.likes.all %}
-                                    <i class="bi bi-hand-thumbs-up-fill"></i>
-                                {% else %}
-                                    <i class="bi bi-hand-thumbs-up"></i>
-                                {% endif %}
-                                {{ post.total_likes }}
-                            </button>
-                        </form>
-            
-                        <!-- Unlike Button -->
-                        <form action="{% url 'unlike_post' post.pk %}" method="POST" class="mb-0">
-                            {% csrf_token %}
-                            <button type="submit" class="btn btn-outline-primary">
-                                {% if user in post.unlikes.all %}
-                                    <i class="bi bi-hand-thumbs-down-fill"></i>
-                                {% else %}
-                                    <i class="bi bi-hand-thumbs-down"></i>
-                                {% endif %}
-                                {{ post.total_unlikes }}
-                            </button>
-                        </form>
-                    {% else %}
-                        <!-- Disabled for unauthenticated users -->
-                        <button class="btn btn-outline-secondary" disabled>
-                            <i class="bi bi-hand-thumbs-up"></i> {{ post.total_likes }}
-                        </button>
-                        <button class="btn btn-outline-secondary" disabled>
-                            <i class="bi bi-hand-thumbs-down"></i> {{ post.total_unlikes }}
-                        </button>
-                    {% endif %}
+            <!-- Main card with enhanced design -->
+            <div class="card border-0 shadow-lg rounded-4 overflow-hidden mb-5">
+                {% if post.header_image %}
+                <div class="post-header-image" style="height: 400px; overflow: hidden;">
+                    <img src="{{ post.header_image.url }}" class="img-fluid w-100" alt="{{ post.title }}" style="object-fit: cover;">
                 </div>
-            
-                <!-- Edit / Delete Section -->
-                {% if user.is_authenticated and user.id == post.author.id %}
-                    <div class="d-flex align-items-center gap-2">
-                        <a href="{% url 'post_update' post.pk %}" class="btn btn-outline-warning" data-bs-toggle="tooltip" title="Edit">
-                            <i class="bi bi-pencil-square"></i>
-                        </a>
-                        <a href="{% url 'post_delete' post.pk %}" class="btn btn-outline-danger" data-bs-toggle="tooltip" title="Delete">
-                            <i class="bi bi-trash"></i>
+                {% endif %}
+                
+                <div class="card-body p-4 p-md-5">
+                    <!-- Category badge -->
+                    <div class="mb-3">
+                        <span class="badge border border-primary text-primary rounded-pill px-3 py-2 bg-white">
+                            {{ post.category }}
+                        </span>
+                    </div>
+                    
+                    <!-- Title -->
+                    <h1 class="card-title display-5 fw-bold mb-3">{{ post.title }}</h1>
+                    
+                    <!-- Author and date info -->
+                    <div class="d-flex align-items-center mb-4">
+                        <div class="avatar me-3">
+                            {% if post.author.profile.profile_pic %}
+                                <img src="{{ post.author.profile.profile_pic.url }}" class="rounded-circle" width="48" height="48" alt="{{ post.author.username }}">
+                            {% else %}
+                                <div class="avatar-initial bg-light text-dark rounded-circle d-flex align-items-center justify-content-center" style="width: 48px; height: 48px;">
+                                    <i class="bi bi-person-fill fs-5"></i>
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div>
+                            <h6 class="mb-0 fw-bold">{{ post.author.first_name }} {{ post.author.last_name }}</h6>
+                            <small class="text-muted">
+                                <i class="bi bi-calendar me-1"></i> {{ post.post_date|date:"F j, Y" }} 
+                                <i class="bi bi-clock ms-3 me-1"></i> {{ post.read_time }} min read
+                            </small>
+                        </div>
+                    </div>
+                    
+                    <hr class="my-4">
+                    
+                    <!-- Post content with improved typography -->
+                    <div class="card-text post-content">
+                        {{ post.body|safe }}
+                    </div>
+                    
+                    <!-- Like/Unlike and Edit/Delete section -->
+                    <div class="d-flex justify-content-between align-items-center mt-5 pt-4 border-top">
+                        <!-- Reactions section -->
+                        <div class="d-flex align-items-center gap-3">
+                            {% if user.is_authenticated %}
+                                <!-- Like Button -->
+                                <form action="{% url 'like_post' post.pk %}" method="POST" class="mb-0">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-sm btn-outline-primary rounded-pill px-3 py-2 reaction-btn">
+                                        {% if user in post.likes.all %}
+                                            <i class="bi bi-hand-thumbs-up-fill me-2"></i>
+                                        {% else %}
+                                            <i class="bi bi-hand-thumbs-up me-2"></i>
+                                        {% endif %}
+                                        <span class="reaction-count">{{ post.total_likes }}</span>
+                                    </button>
+                                </form>
+                    
+                                <!-- Unlike Button -->
+                                <form action="{% url 'unlike_post' post.pk %}" method="POST" class="mb-0">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-sm btn-outline-primary rounded-pill px-3 py-2 reaction-btn">
+                                        {% if user in post.unlikes.all %}
+                                            <i class="bi bi-hand-thumbs-down-fill me-2"></i>
+                                        {% else %}
+                                            <i class="bi bi-hand-thumbs-down me-2"></i>
+                                        {% endif %}
+                                        <span class="reaction-count">{{ post.total_unlikes }}</span>
+                                    </button>
+                                </form>
+                            {% else %}
+                                <!-- Disabled for unauthenticated users -->
+                                <button class="btn btn-sm btn-outline-secondary rounded-pill px-3 py-2" disabled>
+                                    <i class="bi bi-hand-thumbs-up me-2"></i> {{ post.total_likes }}
+                                </button>
+                                <button class="btn btn-sm btn-outline-secondary rounded-pill px-3 py-2" disabled>
+                                    <i class="bi bi-hand-thumbs-down me-2"></i> {{ post.total_unlikes }}
+                                </button>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Edit/Delete buttons for author -->
+                        {% if user.is_authenticated and user.id == post.author.id %}
+                        <div class="btn-group" role="group">
+                            <a href="{% url 'post_update' post.pk %}" class="btn btn-sm btn-outline-warning rounded-start-pill px-3" data-bs-toggle="tooltip" title="Edit">
+                                <i class="bi bi-pencil-square me-2"></i>Edit
+                            </a>
+                            <a href="{% url 'post_delete' post.pk %}" class="btn btn-sm btn-outline-danger rounded-end-pill px-3" data-bs-toggle="tooltip" title="Delete">
+                                <i class="bi bi-trash me-2"></i>Delete
+                            </a>
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    {% if not user.is_authenticated %}
+                    <div class="mt-4 text-center">
+                        <a href="{% url 'login' %}?next={{ request.path }}" class="btn btn-primary rounded-pill px-4">
+                            <i class="bi bi-box-arrow-in-right me-2"></i>Login to react
                         </a>
                     </div>
-                {% endif %}
+                    {% endif %}
+                </div>
             </div>
             
-            {% if not user.is_authenticated %}
-                <p class="mt-2"><a href="{% url 'login' %}?next={{ request.path }}">Login</a> to like or unlike this post.</p>
+            <!-- Author bio section -->
+            {% if post.author.profile %}
+            <div class="card border-0 shadow-sm rounded-4 mb-5">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center mb-3">
+                        {% if post.author.profile.profile_pic %}
+                            <img src="{{ post.author.profile.profile_pic.url }}" class="rounded-circle me-3" width="64" height="64" alt="{{ post.author.username }}">
+                        {% else %}
+                            <div class="avatar-initial bg-light text-dark rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 64px; height: 64px;">
+                                <i class="bi bi-person-fill fs-3"></i>
+                            </div>
+                        {% endif %}
+                        <div>
+                            <h5 class="mb-0 fw-bold">{{ post.author.first_name }} {{ post.author.last_name }}</h5>
+                            <small class="text-muted">Author</small>
+                        </div>
+                    </div>
+                    <p class="mb-0">{{ post.author.profile.bio|default:"This author hasn't written a bio yet." }}</p>
+                </div>
+            </div>
             {% endif %}
-            
         </div>
     </div>
 </div>
+
+<style>
+    .post-content {
+        font-size: 1.1rem;
+        line-height: 1.8;
+        color: #495057;
+    }
+    
+    .post-content img {
+        max-width: 100%;
+        height: auto;
+        border-radius: 0.5rem;
+        margin: 1.5rem 0;
+    }
+    
+    .post-content h2, 
+    .post-content h3, 
+    .post-content h4 {
+        margin-top: 2rem;
+        margin-bottom: 1rem;
+    }
+    
+    .post-content blockquote {
+        border-left: 4px solid #0d6efd;
+        padding-left: 1.5rem;
+        margin: 1.5rem 0;
+        color: #6c757d;
+        font-style: italic;
+    }
+    
+    .post-content pre {
+        background-color: #f8f9fa;
+        padding: 1rem;
+        border-radius: 0.5rem;
+        overflow-x: auto;
+    }
+    
+    .post-header-image {
+        border-bottom: 1px solid rgba(0,0,0,0.1);
+    }
+    
+    .reaction-btn:hover {
+        transform: translateY(-2px);
+        transition: all 0.2s ease;
+    }
+    
+    .avatar-initial {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: #f8f9fa;
+    }
+</style>
 {% endblock %}
